@@ -15,11 +15,16 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/layer.css">
     <script src="js/layer.js"></script>
+    <script src="js/Dplayer/DPlayer.min.js"></script>
 </head>
 <body>
     <div id="app">
-        <div class="music"><img style="position: absolute;right: 1rem; top: 1rem; height: 5rem;width: 5rem;" id="audio" src="./imgs/audio_on.png" title="on"></div>
+        <div class="music"><img style="position: absolute;right: 1rem; top: 1rem; height: 5rem;width: 5rem; z-index: 99" id="audio" src="./imgs/audio_on.png" title="on"></div>
+        <div id="dplayer" style="position: absolute; text-align: center; margin-top: 50%;z-index: 999; display: none"></div>
+        <div id="shandow" class="cover-all"></div>
     </div>
+
+
 
 
 </body>
@@ -39,6 +44,37 @@
             audio.pause();
         }
 
+    })
+
+    const dp = new DPlayer({
+        container: document.getElementById('dplayer'),
+        video: {
+            url: './video/1086x716.mp4',
+        },
+        // autoplay:true,
+        loop:true,
+
+    });
+
+    $("#dplayer").on("touchend",function (e) {
+        let dom = document.querySelector('#audio');
+        let event = document.createEvent('Events');
+        // 初始化一个点击事件，可以冒泡，无法被取消
+        event.initEvent('touchend', true, false);
+        // 触发事件监听
+        dom.dispatchEvent(event)
+        dp.toggle();
+
+    });
+    $("#shandow").on("touchend",function () {
+        $("#shandow").hide();
+        let dom = document.querySelector('#dplayer');
+        let event = document.createEvent('Events');
+        // 初始化一个点击事件，可以冒泡，无法被取消
+        event.initEvent('touchend', true, false);
+        // 触发事件监听
+        dom.dispatchEvent(event)
+        $("#dplayer").hide();
     })
 </script>
 </html>

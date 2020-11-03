@@ -42,9 +42,7 @@ function init() {
     //环境光
     let ambient = new THREE.AmbientLight(0x444444);
     scene.add(ambient);
-    createMesh('./imgs/scene/');
-    addMagnifier(new THREE.Vector3(4,-7,16));
-    addArrow(new THREE.Vector3(-14,-4.5,-10))
+    fistScene();
     addBGM('./music/Chinese.mp3')
 }
 
@@ -52,23 +50,21 @@ function init() {
  * 封装 创造网格的 函数
  */
 function createMesh(url) {
-    // if (!mesh) {
-        //前后上下左右
-        let a = [
-            loadTexture(url + "pano_f.jpg"),
-            loadTexture(url + "pano_b.jpg"),
-            loadTexture(url + "pano_u.jpg"),
-            loadTexture(url + "pano_d.jpg"),
-            loadTexture(url + "pano_l.jpg"),
-            loadTexture(url + "pano_r.jpg")
-        ];
-        mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(300, 300, 300),
-            a,
+    //前后上下左右
+    let a = [
+        loadTexture(url + "pano_f.jpg"),
+        loadTexture(url + "pano_b.jpg"),
+        loadTexture(url + "pano_u.jpg"),
+        loadTexture(url + "pano_d.jpg"),
+        loadTexture(url + "pano_l.jpg"),
+        loadTexture(url + "pano_r.jpg")
+    ];
+    mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(300, 300, 300),
+        a,
 
-        );
-        mesh.scale.x= -1;
-    // }
+    );
+    mesh.scale.x= -1;
     scene.add(mesh);
 }
 
@@ -76,20 +72,20 @@ function createMesh(url) {
  * 描述图标
  * @param vector3
  */
-function addMagnifier(vector3) {
-    var texture = new THREE.TextureLoader().load("./imgs/magnifier.png");
-    var spriteMaterial = new THREE.SpriteMaterial({
-        // color:0xff00ff,//设置精灵矩形区域颜色
-        // rotation:Math.PI/4,//旋转精灵对象45度，弧度值
+function addMagnifier(vector3,name) {
+    console.log(name)
+    let texture = new THREE.TextureLoader().load("./imgs/magnifier.png");
+    let spriteMaterial = new THREE.SpriteMaterial({
         map: texture,//设置精灵纹理贴图
     });
     // 创建精灵模型对象，不需要几何体geometry参数
-    var sprite = new THREE.Sprite(spriteMaterial);
+    let sprite = new THREE.Sprite(spriteMaterial);
     scene.add(sprite);
     // 控制精灵大小，比如可视化中精灵大小表征数据大小
     sprite.scale.set(1, 1, 2); //// 只需要设置x、y两个分量就可以
     sprite.position.set(vector3.x, vector3.y,vector3.z);
-    sprite.name = 'chair';
+    sprite.name = name;
+    console.log(sprite)
     objects.push(sprite);
 }
 
@@ -97,11 +93,11 @@ function addMagnifier(vector3) {
  * 添加导向箭头
  * @param vector3
  */
-function addArrow(vector3) {
+function addArrow(vector3,sceneName,rotation) {
     var texture = new THREE.TextureLoader().load("./imgs/up_arrow.png");
     var spriteMaterial = new THREE.SpriteMaterial({
         // color:0xff00ff,//设置精灵矩形区域颜色
-        rotation:Math.PI/2,//旋转精灵对象45度，弧度值
+        rotation:rotation,//旋转精灵对象45度，弧度值
         map: texture,//设置精灵纹理贴图
     });
     var sprite = new THREE.Sprite(spriteMaterial);
@@ -109,7 +105,7 @@ function addArrow(vector3) {
     // 控制精灵大小，比如可视化中精灵大小表征数据大小
     sprite.scale.set(1, 1, 2); //// 只需要设置x、y两个分量就可以
     sprite.position.set(vector3.x, vector3.y,vector3.z);
-    sprite.name = 'scene2';
+    sprite.name = sceneName;
     objects.push(sprite);
 }
 
@@ -131,12 +127,6 @@ function addBGM(url) {
         audio.setBuffer(AudioBuffer);
         audio.setLoop(true); //是否循环
         audio.setVolume(1); //音量
-        // let dom = document.querySelector('#audio');
-        // var event = document.createEvent('Events');
-        // // 初始化一个点击事件，可以冒泡，无法被取消
-        // event.initEvent('touchend', true, false);
-        // // 触发事件监听
-        // dom.dispatchEvent(event);
         // 播放缓冲区中的音频数据
         audio.play(); //play播放、stop停止、pause暂停
     });
@@ -196,11 +186,6 @@ function onDocumentTouchStart(a) {
     startY = a.touches[0].pageY;
     startLon = lon;
     startLat = lat;
-    if (!audio.isPlaying){
-        audio.play();
-        $("#audio").src = "./imgs/audio_on.png";
-        $("#audio").title = "on";
-    }
 }
 function onDocumentTouchMove(c) {
     c.preventDefault();
@@ -234,6 +219,12 @@ function getMousePosition(event){
             case 'chair':
                 showTextDialog();
                 break;
+            case 'video':
+                showVideoDialog();
+                break;
+            case 'scene':
+                fistScene();
+                break;
             case 'scene2':
                 changeScene('scene2','./imgs/scene2/');
                 break;
@@ -255,6 +246,14 @@ function showTextDialog(){
     })
 }
 
+function fistScene() {
+    scene = new THREE.Scene();
+    createMesh('./imgs/scene/');
+    addMagnifier(new THREE.Vector3(4,-7,16),'chair');
+    addArrow(new THREE.Vector3(-14,-4.5,-10),'scene2',Math.PI/2);
+    renderer.render(scene,camera);
+}
+
 /**
  * 切换场景
  * @param sceneName
@@ -262,7 +261,15 @@ function showTextDialog(){
 function changeScene(sceneName,url) {
     scene = new THREE.Scene();
     createMesh(url);
+    addMagnifier(new THREE.Vector3(1,-2,19),'video');
+    addArrow(new THREE.Vector3(9,-7,-8),'scene',Math.PI/4)
     renderer.render(scene,camera);
+}
+
+function showVideoDialog(){
+    $("#shandow").show();
+    $("#dplayer").show();
+
 }
 
 
