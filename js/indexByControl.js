@@ -82,7 +82,7 @@ function addMagnifier(vector3,name) {
     let sprite = new THREE.Sprite(spriteMaterial);
     scene.add(sprite);
     // 控制精灵大小，比如可视化中精灵大小表征数据大小
-    sprite.scale.set(1, 1, 2); //// 只需要设置x、y两个分量就可以
+    sprite.scale.set(2, 2, 2); //// 只需要设置x、y两个分量就可以
     sprite.position.set(vector3.x, vector3.y,vector3.z);
     sprite.name = name;
     console.log(sprite)
@@ -103,7 +103,7 @@ function addArrow(vector3,sceneName,rotation) {
     var sprite = new THREE.Sprite(spriteMaterial);
     scene.add(sprite);
     // 控制精灵大小，比如可视化中精灵大小表征数据大小
-    sprite.scale.set(1, 1, 2); //// 只需要设置x、y两个分量就可以
+    sprite.scale.set(2, 2, 2); //// 只需要设置x、y两个分量就可以
     sprite.position.set(vector3.x, vector3.y,vector3.z);
     sprite.name = sceneName;
     objects.push(sprite);
@@ -250,7 +250,7 @@ function fistScene() {
     scene = new THREE.Scene();
     createMesh('./imgs/scene/');
     addMagnifier(new THREE.Vector3(4,-7,16),'chair');
-    addArrow(new THREE.Vector3(-14,-4.5,-10),'scene2',Math.PI/2);
+    addArrow(new THREE.Vector3(-14,-4.5,-10),'scene2',- Math.PI / 4);
     renderer.render(scene,camera);
 }
 
@@ -262,7 +262,7 @@ function changeScene(sceneName,url) {
     scene = new THREE.Scene();
     createMesh(url);
     addMagnifier(new THREE.Vector3(1,-2,19),'video');
-    addArrow(new THREE.Vector3(9,-7,-8),'scene',Math.PI/4)
+    addArrow(new THREE.Vector3(9,-7,-8),'scene',-  3 * Math.PI / 4)
     renderer.render(scene,camera);
 }
 
