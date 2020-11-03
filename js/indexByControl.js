@@ -1,8 +1,8 @@
 let camera, scene, renderer,mesh,controls;
 let width = window.innerWidth,height = window.innerHeight;
+
 let mouse = new THREE.Vector2();
 let raycaster = new THREE.Raycaster();
-let objects = [];
 let lon = 90, // 屏幕横轴偏移量
     lat = 0,  // 屏幕纵轴偏移量
     phi = 0,  // 相机的横屏面 到y轴 的 偏移弧度
@@ -12,6 +12,10 @@ let lon = 90, // 屏幕横轴偏移量
     startY, // 记录鼠标按下的时候纵轴位置
     startLon, // 记录移动时的鼠标横轴位置
     startLat; // 记录移动时的鼠标横轴位置
+
+let objects = [];
+
+let listener, audio, audioLoader;
 
 function init() {
     let box;
@@ -41,6 +45,7 @@ function init() {
     createMesh('./imgs/scene/');
     addMagnifier(new THREE.Vector3(4,-7,16));
     addArrow(new THREE.Vector3(-14,-4.5,-10))
+    addBGM('./music/Chinese.mp3')
 }
 
 /**
@@ -109,6 +114,38 @@ function addArrow(vector3) {
 }
 
 /**
+ * 添加背景音乐
+ * @param url
+ */
+function addBGM(url) {
+    // 创建一个监听者
+    listener = new THREE.AudioListener();
+    camera.add( listener );
+    // 创建一个非位置音频对象  用来控制播放
+    audio = new THREE.Audio(listener);
+    // 创建一个音频加载器对象
+    audioLoader = new THREE.AudioLoader();
+    // 加载音频文件，返回一个音频缓冲区对象作为回调函数参数
+    audioLoader.load(url, function(AudioBuffer) {
+        // 音频缓冲区对象关联到音频对象audio
+        audio.setBuffer(AudioBuffer);
+        audio.setLoop(true); //是否循环
+        audio.setVolume(1); //音量
+        // let dom = document.querySelector('#audio');
+        // var event = document.createEvent('Events');
+        // // 初始化一个点击事件，可以冒泡，无法被取消
+        // event.initEvent('touchend', true, false);
+        // // 触发事件监听
+        // dom.dispatchEvent(event);
+        // 播放缓冲区中的音频数据
+        audio.play(); //play播放、stop停止、pause暂停
+    });
+    audio.autoplay = true;
+    scene.add(audio);
+    // renderer.render(scene,camera);
+}
+
+/**
  * 封装纹理贴图函数
  * @param d
  * @returns {MeshBasicMaterial}
@@ -158,7 +195,12 @@ function onDocumentTouchStart(a) {
     startX = a.touches[0].pageX;
     startY = a.touches[0].pageY;
     startLon = lon;
-    startLat = lat
+    startLat = lat;
+    if (!audio.isPlaying){
+        audio.play();
+        $("#audio").src = "./imgs/audio_on.png";
+        $("#audio").title = "on";
+    }
 }
 function onDocumentTouchMove(c) {
     c.preventDefault();

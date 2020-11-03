@@ -1,0 +1,10 @@
+music {
+    float: right;
+}
+audio{
+    position: absolute;
+    right: 0;
+    height: 5rem;
+    width: 5rem;
+
+}
