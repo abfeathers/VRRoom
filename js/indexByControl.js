@@ -85,7 +85,6 @@ function addMagnifier(vector3,name) {
     sprite.scale.set(2, 2, 2); //// 只需要设置x、y两个分量就可以
     sprite.position.set(vector3.x, vector3.y,vector3.z);
     sprite.name = name;
-    console.log(sprite)
     objects.push(sprite);
 }
 
@@ -96,7 +95,6 @@ function addMagnifier(vector3,name) {
 function addArrow(vector3,sceneName,rotation) {
     var texture = new THREE.TextureLoader().load("./imgs/up_arrow.png");
     var spriteMaterial = new THREE.SpriteMaterial({
-        // color:0xff00ff,//设置精灵矩形区域颜色
         rotation:rotation,//旋转精灵对象45度，弧度值
         map: texture,//设置精灵纹理贴图
     });
@@ -132,7 +130,7 @@ function addBGM(url) {
     });
     audio.autoplay = true;
     scene.add(audio);
-    // renderer.render(scene,camera);
+    renderer.render(scene,camera);
 }
 
 /**
@@ -214,7 +212,6 @@ function getMousePosition(event){
 
     //点中了添加的元素
     if (intersects.length > 0){
-        console.log(intersects[0].object)
         switch (intersects[0].object.name) {
             case 'chair':
                 showTextDialog();
