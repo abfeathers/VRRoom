@@ -42,7 +42,9 @@ function init() {
     //环境光
     let ambient = new THREE.AmbientLight(0x444444);
     scene.add(ambient);
-    fistScene();
+    scene = new THREE.Scene();
+    createMesh('./imgs/scene3/first.jpg');
+    fistScene('scene','./imgs/scene3/first.jpg',170);
     // addBGM('./music/Chinese.mp3')
 }
 
@@ -50,10 +52,9 @@ function init() {
  * 封装 创造网格的 函数
  */
 function createMesh(url) {
-    //前后上下左右
     mesh = new THREE.Mesh(
         new THREE.SphereGeometry(300, 100, 100),
-        loadTexture(url + "1281604848584_.pic_hd.jpg"),
+        loadTexture(url),
 
     );
     mesh.scale.x= -1;
@@ -102,7 +103,7 @@ function addMagnifier(vector3,name) {
  * 添加导向箭头
  * @param vector3
  */
-function addArrow(vector3,sceneName,rotation) {
+function addArrow(vector3,sceneName,rotation,resetLon) {
     let texture = new THREE.TextureLoader().load("./imgs/up_arrow.png");
     let spriteMaterial = new THREE.SpriteMaterial({
         rotation:rotation,//旋转精灵对象45度，弧度值
@@ -113,8 +114,9 @@ function addArrow(vector3,sceneName,rotation) {
     // 控制精灵大小，比如可视化中精灵大小表征数据大小
     sprite.scale.set(2, 2, 2); //// 只需要设置x、y两个分量就可以
     sprite.position.set(vector3.x, vector3.y,vector3.z);
-    sprite.name = sceneName;
+    sprite.name = sceneName + ";"+resetLon;
     objects.push(sprite);
+    return sprite;
 }
 
 
@@ -178,18 +180,25 @@ function getMousePosition(event){
 
     //点中了添加的元素
     if (intersects.length > 0){
-        switch (intersects[0].object.name) {
-            case 'chair':
+        let value = intersects[0].object.name.split(";");
+        switch (value[0]) {
+            case 'text':
                 showTextDialog();
                 break;
             case 'video':
                 showVideoDialog();
                 break;
             case 'scene':
-                fistScene();
+                fistScene('scene','./imgs/scene3/first.jpg',parseInt(value[1]));
                 break;
             case 'scene2':
-                changeScene('scene2','./imgs/scene3/1301604848587_.pic_hd.jpg');
+                secondScene('scene2','./imgs/scene3/second.jpg',parseInt(value[1]));
+                break;
+            case 'scene3':
+                thirdScene('scene3','./imgs/scene3/third.jpg', parseInt(value[1]));
+                break;
+            case 'scene4':
+                fourScene('scene4','./imgs/scene3/four.jpg',90);
                 break;
             default:
                 break;
@@ -206,27 +215,87 @@ function showTextDialog(){
     layer.open({
         style: 'border:none;',
         content:'一段文本描述'
+
     })
 }
 
-function fistScene() {
-    scene = new THREE.Scene();
-    createMesh('./imgs/scene3/');
-    addArrow(new THREE.Vector3(-20,-3,6),'scene2',- Math.PI / 3);
-    renderer.render(scene,camera);
+function fistScene(sceneName,url,resetLon) {
+    textureLoader.load(url,function (texture) {
+        mesh.material.map = texture;
+        for (let item in objects){
+            objects.pop();
+        }
+        scene.remove(scene.children[1],scene.children[2]);
+        addArrow(new THREE.Vector3(-17,-7,0),'scene2',- Math.PI  / 3, 0);
+        lon = resetLon;
+        update();
+        renderer.render(scene,camera);
+    });
+
 }
 
 /**
- * 切换场景
+ * 切换场景2
  * @param sceneName
+ * @param url
+ * @param resetLon 重设横向移动
  */
-function changeScene(sceneName,url) {
+function secondScene(sceneName,url,resetLon) {
+    textureLoader.load(url,function (texture) {
+        mesh.material.map = texture;
+        console.log(scene);
+        for (let item in objects){
+            let object = objects.pop();
+            // console.log(object);
+            // scene.remove(object);
+        }
+        scene.remove(scene.children[1],scene.children[2]);
+        addArrow(new THREE.Vector3(24,-7,-7),'scene3',- Math.PI * 2 / 3, 170);
+        addArrow(new THREE.Vector3(-24,-7,0),'scene',- Math.PI * 1 / 2,  -30);
+        lon = resetLon;
+        update();
+        renderer.render(scene,camera);
+    });
+}
+
+/**
+ * 切换场景3
+ * @param sceneName
+ * @param url
+ * @param resetLon 重设横向移动
+ */
+function thirdScene(sceneName,url,resetLon) {
+    textureLoader.load(url,function (texture) {
+        mesh.material.map = texture;
+        for (let item in objects){
+            objects.pop();
+        }
+        scene.remove(scene.children[1],scene.children[2]);
+        addArrow(new THREE.Vector3(-40,-7,3),'scene4',- Math.PI);
+        addArrow(new THREE.Vector3(20,-12,-16),'scene2',- Math.PI * 3 / 4, 180);
+        lon = resetLon;
+        update();
+        renderer.render(scene,camera);
+    });
+}
+
+/**
+ * 切换场景4
+ * @param sceneName
+ * @param url
+ * @param resetLon 重设横向移动
+ */
+function fourScene(sceneName,url,resetLon) {
     textureLoader.load(url,function (texture) {
         mesh.material.map = texture;
         for (let item in objects){
             let object = objects.pop();
+            console.log(object);
             scene.remove(object);
         }
+        addArrow(new THREE.Vector3(1,-7,-27),'scene3',- Math.PI  / 3, 0);
+        lon = resetLon;
+        update();
         renderer.render(scene,camera);
     });
 }
