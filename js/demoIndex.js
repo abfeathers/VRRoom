@@ -55,8 +55,8 @@ function createMesh(url) {
     mesh = new THREE.Mesh(
         new THREE.SphereGeometry(300, 100, 100),
         loadTexture(url),
-
     );
+    mesh.material.transparent = true;
     mesh.scale.x= -1;
     scene.add(mesh);
 }
@@ -220,16 +220,24 @@ function showTextDialog(){
 }
 
 function fistScene(sceneName,url,resetLon) {
+    let promise = new Promise(function (resolve, reject) {
+        setTextureOpacity(mesh.material.map);
+        resolve();
+    });
     textureLoader.load(url,function (texture) {
-        mesh.material.map = texture;
-        for (let item in objects){
-            objects.pop();
-        }
-        scene.remove(scene.children[1],scene.children[2]);
-        addArrow(new THREE.Vector3(-17,-7,0),'scene2',- Math.PI  / 3, 0);
-        lon = resetLon;
-        update();
-        renderer.render(scene,camera);
+        promise.then(function () {
+            texture.opacity = 1;
+            mesh.material.map = texture;
+            mesh.material.opacity = 1;
+            for (let item in objects){
+                objects.pop();
+            }
+            scene.remove(scene.children[1],scene.children[2]);
+            addArrow(new THREE.Vector3(-17,-7,0),'scene2',- Math.PI  / 3, 0);
+            lon = resetLon;
+            update();
+            renderer.render(scene,camera);
+        })
     });
 
 }
@@ -241,8 +249,10 @@ function fistScene(sceneName,url,resetLon) {
  * @param resetLon 重设横向移动
  */
 function secondScene(sceneName,url,resetLon) {
+    setTextureOpacity(mesh.material.map)
     textureLoader.load(url,function (texture) {
         mesh.material.map = texture;
+        mesh.material.opacity = 1;
         console.log(scene);
         for (let item in objects){
             let object = objects.pop();
@@ -265,8 +275,10 @@ function secondScene(sceneName,url,resetLon) {
  * @param resetLon 重设横向移动
  */
 function thirdScene(sceneName,url,resetLon) {
+    setTextureOpacity(mesh.material.map)
     textureLoader.load(url,function (texture) {
         mesh.material.map = texture;
+        mesh.material.opacity = 1;
         for (let item in objects){
             objects.pop();
         }
@@ -286,8 +298,10 @@ function thirdScene(sceneName,url,resetLon) {
  * @param resetLon 重设横向移动
  */
 function fourScene(sceneName,url,resetLon) {
+    setTextureOpacity(mesh.material.map)
     textureLoader.load(url,function (texture) {
         mesh.material.map = texture;
+        mesh.material.opacity = 1;
         for (let item in objects){
             let object = objects.pop();
             console.log(object);
@@ -298,6 +312,34 @@ function fourScene(sceneName,url,resetLon) {
         update();
         renderer.render(scene,camera);
     });
+}
+
+/**
+ * 旋转场景
+ */
+setInterval(function () {
+    // sphere.rotateY(Math.PI / 180);
+    renderer.render(scene, camera);
+}, 1000 / 60)
+
+/**
+ * 设置透明度
+ * @param texture
+ */
+function setTextureOpacity(texture) {
+    setTimeout(function(){
+        setInterval(function(){
+            if (mesh.material.opacity > 0.5){
+                // 改变的透明度
+                texture.opacity -= 0.05;
+                mesh.material.opacity -= 0.05;
+            }else{
+                clearTimeout();
+                clearInterval();
+            }
+        }, 100);
+    }, 1000)
+
 }
 
 function showVideoDialog(){
