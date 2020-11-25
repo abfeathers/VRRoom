@@ -16,6 +16,7 @@ let lon = 90, // 屏幕横轴偏移量
 let objects = [];
 let textureLoader;
 let listener, audio, audioLoader;
+let move = 0;
 
 function init() {
     let box;
@@ -29,19 +30,19 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     box.appendChild(renderer.domElement);
-    renderer.setClearColor(0xb9d3ff, 1); //设置背景颜色
+    renderer.setClearColor(0xffffff, 1); //设置背景颜色
     box.addEventListener('touchstart',onDocumentTouchStart,false);
     box.addEventListener('touchmove',onDocumentTouchMove,false);
     box.addEventListener('touchend',getMousePosition,false);
 
     controls = new THREE.DeviceOrientationControls( camera, renderer.domElement );
     controls.update();
-    let point = new THREE.PointLight(0xffffff);
-    point.position.set(200, 200, 300); //点光源位置
-    scene.add(point); //点光源添加到场景中
-    //环境光
-    let ambient = new THREE.AmbientLight(0x444444);
-    scene.add(ambient);
+    // let point = new THREE.PointLight(0xffffff);
+    // point.position.set(200, 200, 300); //点光源位置
+    // scene.add(point); //点光源添加到场景中
+    // //环境光
+    // let ambient = new THREE.AmbientLight(0xffffff);
+    // scene.add(ambient);
     scene = new THREE.Scene();
     createMesh('./imgs/scene3/first.jpg');
     fistScene('scene','./imgs/scene3/first.jpg',170);
@@ -192,6 +193,7 @@ function getMousePosition(event){
                 fistScene('scene','./imgs/scene3/first.jpg',parseInt(value[1]));
                 break;
             case 'scene2':
+                move = 0;
                 secondScene('scene2','./imgs/scene3/second.jpg',parseInt(value[1]));
                 break;
             case 'scene3':
@@ -220,24 +222,18 @@ function showTextDialog(){
 }
 
 function fistScene(sceneName,url,resetLon) {
-    let promise = new Promise(function (resolve, reject) {
-        setTextureOpacity(mesh.material.map);
-        resolve();
-    });
     textureLoader.load(url,function (texture) {
-        promise.then(function () {
-            texture.opacity = 1;
-            mesh.material.map = texture;
-            mesh.material.opacity = 1;
-            for (let item in objects){
-                objects.pop();
-            }
-            scene.remove(scene.children[1],scene.children[2]);
-            addArrow(new THREE.Vector3(-17,-7,0),'scene2',- Math.PI  / 3, 0);
-            lon = resetLon;
-            update();
-            renderer.render(scene,camera);
-        })
+        texture.opacity = 1;
+        mesh.material.map = texture;
+        mesh.material.opacity = 1;
+        for (let item in objects){
+            objects.pop();
+        }
+        scene.remove(scene.children[1],scene.children[2]);
+        addArrow(new THREE.Vector3(-17,-7,0),'scene2',- Math.PI  / 3, 0);
+        lon = resetLon;
+        update();
+        renderer.render(scene,camera);
     });
 
 }
@@ -249,23 +245,20 @@ function fistScene(sceneName,url,resetLon) {
  * @param resetLon 重设横向移动
  */
 function secondScene(sceneName,url,resetLon) {
-    setTextureOpacity(mesh.material.map)
     textureLoader.load(url,function (texture) {
-        mesh.material.map = texture;
-        mesh.material.opacity = 1;
-        console.log(scene);
         for (let item in objects){
-            let object = objects.pop();
-            // console.log(object);
-            // scene.remove(object);
+            objects.pop();
         }
         scene.remove(scene.children[1],scene.children[2]);
-        addArrow(new THREE.Vector3(24,-7,-7),'scene3',- Math.PI * 2 / 3, 170);
-        addArrow(new THREE.Vector3(-24,-7,0),'scene',- Math.PI * 1 / 2,  -30);
-        lon = resetLon;
-        update();
-        renderer.render(scene,camera);
-    });
+        setTextureOpacity(texture,resetLon).then(function(){
+            console.log(scene);;
+            addArrow(new THREE.Vector3(24,-7,-7),'scene3',- Math.PI * 2 / 3, 170);
+            addArrow(new THREE.Vector3(-24,-7,0),'scene',- Math.PI * 1 / 2,  -30);
+            renderer.render(scene,camera);
+        }
+    )})
+
+
 }
 
 /**
@@ -275,7 +268,6 @@ function secondScene(sceneName,url,resetLon) {
  * @param resetLon 重设横向移动
  */
 function thirdScene(sceneName,url,resetLon) {
-    setTextureOpacity(mesh.material.map)
     textureLoader.load(url,function (texture) {
         mesh.material.map = texture;
         mesh.material.opacity = 1;
@@ -298,7 +290,6 @@ function thirdScene(sceneName,url,resetLon) {
  * @param resetLon 重设横向移动
  */
 function fourScene(sceneName,url,resetLon) {
-    setTextureOpacity(mesh.material.map)
     textureLoader.load(url,function (texture) {
         mesh.material.map = texture;
         mesh.material.opacity = 1;
@@ -317,28 +308,46 @@ function fourScene(sceneName,url,resetLon) {
 /**
  * 旋转场景
  */
-setInterval(function () {
-    // sphere.rotateY(Math.PI / 180);
-    renderer.render(scene, camera);
-}, 1000 / 60)
+// setInterval(function () {
+//     // sphere.rotateY(Math.PI / 180);
+//     renderer.render(scene, camera);
+// }, 1000 / 60)
 
 /**
  * 设置透明度
  * @param texture
  */
-function setTextureOpacity(texture) {
-    setTimeout(function(){
-        setInterval(function(){
-            if (mesh.material.opacity > 0.5){
-                // 改变的透明度
-                texture.opacity -= 0.05;
-                mesh.material.opacity -= 0.05;
-            }else{
-                clearTimeout();
-                clearInterval();
-            }
-        }, 100);
-    }, 1000)
+function setTextureOpacity(texture,resetLon) {
+     return new Promise(function (resolve, reject) {
+         let ctime = setInterval(function(){
+             if (move < 10){
+                 camera.position.x -= 0.5;
+                 texture.opacity -= 0.1;
+                 mesh.material.opacity -= 0.1;
+                 move++;
+             }else {
+                 if(15 > move && move >= 10){
+                     if (10 == move){
+                         mesh.material.map = texture;
+                         lon = resetLon;
+                         update();
+                     }
+                     camera.position.x += 1;
+                     texture.opacity += 0.2;
+                     mesh.material.opacity += 0.2;
+                     move++
+                 }else {
+                     // clearTimeout();
+                     texture.opacity = 1;
+                     mesh.material.opacity = 1;
+                     clearInterval(ctime);
+                     console.log("1111");
+                     resolve("moved");
+                 }
+             }
+         }, 50);
+     });
+
 
 }
 
