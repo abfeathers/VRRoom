@@ -53,6 +53,7 @@ function createMesh(url) {
     );
     mesh.material.transparent = true;
     mesh.scale.x= -1;
+    mesh.renderOrder = 99;
     scene.add(mesh);
 }
 
@@ -103,8 +104,11 @@ function addArrow(vector3,sceneName,rotation,resetLon,isForward) {
     let spriteMaterial = new THREE.SpriteMaterial({
         rotation:rotation,//旋转精灵对象45度，弧度值
         map: texture,//设置精灵纹理贴图
+        side:THREE.DoubleSide
     });
     let sprite = new THREE.Sprite(spriteMaterial);
+    sprite.renderOrder = 1000;
+    sprite.transparent = false;
     scene.add(sprite);
     // 控制精灵大小，比如可视化中精灵大小表征数据大小
     sprite.scale.set(2, 2, 2); //// 只需要设置x、y两个分量就可以
@@ -364,14 +368,13 @@ function setTextureOpacity(texture,resetLon,isForward) {
                      mesh.material.opacity += 0.2;
                      move++
                  }else {
-                     // clearTimeout();
                      texture.opacity = 1;
                      mesh.material.opacity = 1;
                      clearInterval(ctime);
                      resolve("moved");
                  }
              }
-         }, 50);
+         }, 100);
      });
 
 
