@@ -345,9 +345,9 @@ function setTextureOpacity(texture,resetLon,isForward) {
          let ctime = setInterval(function(){
              if (move < 10){
                  if (isForward === 1){
-                     camera.position.x -= 1;
+                     camera.position.x -= 2;
                  }else {
-                     camera.position.x += 1;
+                     camera.position.x += 2;
                  }
                  texture.opacity -= 0.1;
                  mesh.material.opacity -= 0.1;
@@ -360,9 +360,9 @@ function setTextureOpacity(texture,resetLon,isForward) {
                          update();
                      }
                      if (isForward === 1){
-                         camera.position.x += 2;
+                         camera.position.x += 4;
                      }else {
-                         camera.position.x -= 2;
+                         camera.position.x -= 4;
                      }
                      texture.opacity += 0.2;
                      mesh.material.opacity += 0.2;
