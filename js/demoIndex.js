@@ -349,8 +349,8 @@ function setTextureOpacity(texture,resetLon,isForward) {
                  }else {
                      camera.position.x += 2;
                  }
-                 texture.opacity -= 0.09;
-                 mesh.material.opacity -= 0.09;
+                 texture.opacity -= 0.07;
+                 mesh.material.opacity -= 0.07;
                  move++;
              }else {
                  if(15 > move && move >= 10){
